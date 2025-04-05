@@ -1,0 +1,66 @@
+1. Application design and database
+
+Backend Framework & API Design:
+The application will be built using FastAPI for high-performance asynchronous request handling.
+The FastAPI app will be containerized using Docker and deployed with Kubernetes to support horizontal scalability and orchestration.
+Uvicorn will be used to serve the FastAPI app.
+NGINX or a cloud-based load balancer (e.g., AWS ALB) will route traffic to the FastAPI app pods.
+
+Database Design:
+
+PostgreSQL will be used as the primary relational database.
+Indexes will be added on status and created_at to optimize search and sort operations.
+Connection pooling will be implemented using PgBouncer or SQLAlchemy pooling.
+Read replicas may be introduced to scale read-heavy workloads.
+
+Scalability:
+Horizontal scaling is achieved by deploying multiple FastAPI app instances as Kubernetes pods.
+Stateless API design allows seamless horizontal scaling.
+
+Authentication & Authorization:
+Keycloak will be used as the identity and access management solution.
+OAuth2 Connect will be used for authentication.
+Keycloak will manage user roles and permissions (RBAC).
+Access tokens (JWT) will be validated in FastAPI routes using middleware or dependencies.
+
+
+2. Architecture Diagram
+
+The architecture for this FastAPI-based Task Management System is designed to be scalable, secure, and maintainable. Here's how it would be structured:
+
+Users interact with the system via the API, typically using a frontend client or tools like Postman.
+All incoming HTTP requests first pass through a Load Balancer (like NGINX). This distributes traffic evenly across multiple instances of the backend service.
+The FastAPI application is containerized using Docker and deployed on a Kubernetes cluster. 
+Multiple pods of the FastAPI app can be run in parallel to handle high traffic and ensure redundancy. 
+The application is stateless, so it scales horizontally easily.
+The application communicates with a PostgreSQL database, which stores all task-related data. 
+A primary-replica setup may be used to handle large-scale read and write operations efficiently. 
+Read replicas improve read performance and reduce load on the primary database.
+To optimize performance for frequently accessed data, the system integrates a Redis caching layer. 
+The API checks Redis before hitting the database to reduce latency and load.
+Background tasks (like sending emails, processing reports, or cleanup jobs) are offloaded to Celery workers. 
+These workers fetch tasks from Kafka message queue, allowing the main API to stay responsive and fast.
+Authentication and Role-Based Access Control (RBAC) are handled by Keycloak, an open-source identity and access management tool. 
+Users authenticate through OAuth2, and access tokens are verified by the FastAPI backend. 
+Keycloak manages user roles and permissions to protect endpoints.
+For observability, tools like Prometheus and Grafana are used for monitoring and dashboards. 
+ELK Stack (Elasticsearch, Logstash, Kibana) handles centralized logging, making it easier to debug and monitor the application.
+
+
+3. Caching and Message Queuing
+
+Caching:
+Redis will be used to cache frequently accessed task data.
+Read-through caching will be implemented:
+On a GET /task/{id}, the service will first check Redis.
+If a cache hit: return the cached task.
+If a cache miss: query the database, return the result, and store it in Redis with a TTL.
+Cache will be invalidated or updated when the task is modified or deleted.
+
+Message Queuing:
+Celery will be used as the task queue manager with Kafka as the message broker.
+Background tasks include:
+Sending notifications (e.g., task status change).
+Cleaning up old data.
+Generating reports asynchronously.
+Workers will run in separate containers and scaled independently from the API.
