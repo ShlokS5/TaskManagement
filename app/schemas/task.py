@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 from enum import Enum
@@ -21,8 +22,8 @@ class TaskUpdate(BaseModel):
 class TaskOut(TaskBase):
     id: str
     status: TaskStatus
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

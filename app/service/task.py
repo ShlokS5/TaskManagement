@@ -10,8 +10,8 @@ def create_task(db: Session, task_in: TaskCreate):
     db.refresh(task)
     return task
 
-def get_tasks(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(Task).offset(skip).limit(limit).all()
+def get_tasks(db: Session, limit: int = 10, offset: int = 0):
+    return db.query(Task).offset(offset).limit(limit).all()
 
 def get_task(db: Session, task_id: str):
     return db.query(Task).filter(Task.id == task_id).first()
