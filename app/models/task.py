@@ -1,7 +1,7 @@
 import uuid
 from sqlalchemy import Column, String, Enum, DateTime
 from sqlalchemy.sql import func
-from app.db.base import Base
+from app.db.base import Base 
 import enum
 
 class TaskStatus(str, enum.Enum):
